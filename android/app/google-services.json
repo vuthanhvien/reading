@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "510343194804",
+    "firebase_url": "https://read-book1.firebaseio.com",
+    "project_id": "read-book1",
+    "storage_bucket": "read-book1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510343194804:android:466ec77d01c3c295",
+        "android_client_info": {
+          "package_name": "com.vien.readingbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "510343194804-tpv23318b9jv76895ei8779ip0oheik7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCn-VSsr124ISyPpOB4pHcel8nw9JEhhU8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
