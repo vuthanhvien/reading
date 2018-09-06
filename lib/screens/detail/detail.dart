@@ -36,10 +36,12 @@ class _DetailState extends State<Detail> {
     image = widget.data['image'];
     index = widget.index;
     name = widget.data['name'];
+    author = widget.data['author'];
     description = widget.data['description'];
-    chapterList = widget.data['chapter'];
-    chapterListLength = chapterList.length;
+    // chapterList = widget.data['chapter'];
+    // chapterListLength = chapterList != null ? chapterList.length : 0;
     getComment();
+    getChapters();
   }
 
   var tab = 'Mô tả';
@@ -50,6 +52,17 @@ class _DetailState extends State<Detail> {
         if (value != null) {
           commentList = value;
           commentListLengh = commentList.length;
+        }
+      });
+    });
+  }
+
+  getChapters() async {
+    apiService.getChapters(index).then((value) {
+      setState(() {
+        if (value != null) {
+          chapterList = value;
+          chapterListLength = chapterList.length;
         }
       });
     });
@@ -215,7 +228,7 @@ class _DetailState extends State<Detail> {
               : Container(),
           tab == 'Mục lục ($chapterListLength)'
               ? Container(
-                  child: ChapList(dataList: chapterList),
+                  child: ChapList(chapterList, widget.index),
                 )
               : Container(),
           tab == 'Đánh giá ($commentListLengh)'
@@ -233,7 +246,8 @@ class _DetailState extends State<Detail> {
 
 class ChapList extends StatefulWidget {
   final dataList;
-  ChapList({Key key, this.dataList: false}) : super(key: key);
+  final bookId;
+  ChapList(this.dataList, this.bookId);
   _ChapListState createState() => _ChapListState();
 }
 
@@ -249,40 +263,41 @@ class _ChapListState extends State<ChapList> {
     var index = 0;
     List<Widget> chapList = List();
     double width = MediaQuery.of(context).size.width;
-    widget.dataList.forEach((key, item) {
-      print(item);
-      chapList.add(
-        Container(
-          width: width,
-          padding:
-              EdgeInsets.only(left: 15.0, top: 5.0, bottom: 5.0, right: 15.0),
-          decoration: BoxDecoration(
-            color: index % 2 == 0 ? Color(0xfff4f4f4) : Colors.white,
-          ),
-          child: FlatButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Read(item),
-                ),
-              );
-            },
-            child: Text(
-              item['name'],
-              textAlign: TextAlign.start,
+    if (widget.dataList != null) {
+      widget.dataList.forEach((key, item) {
+        chapList.add(
+          Container(
+            width: width,
+            padding:
+                EdgeInsets.only(left: 15.0, top: 5.0, bottom: 5.0, right: 15.0),
+            decoration: BoxDecoration(
+              color: index % 2 == 0 ? Color(0xfff4f4f4) : Colors.white,
+            ),
+            child: FlatButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Read(item),
+                  ),
+                );
+              },
+              child: Text(
+                item['title'],
+                textAlign: TextAlign.start,
+              ),
             ),
           ),
-        ),
-      );
-      index = index + 1;
-    });
+        );
+        index = index + 1;
+      });
+    }
 
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: chapList,
+        children: chapList != null ? chapList : Container(),
       ),
     );
   }

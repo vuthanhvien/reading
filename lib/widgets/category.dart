@@ -10,9 +10,10 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(context) {
-    print(data['image']);
     double width = MediaQuery.of(context).size.width;
+    print(width);
     return FlatButton(
+      padding: EdgeInsets.all(0.0),
       onPressed: () {
         Navigator.push(context, MaterialPageRoute(builder: (_) {
           return CategoryDetail(data, index);
@@ -24,9 +25,10 @@ class CategoryItem extends StatelessWidget {
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: CachedNetworkImageProvider(data['image']),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken)),
+            image: CachedNetworkImageProvider(data['image']),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
+          ),
         ),
         child: Text(
           data['name'],

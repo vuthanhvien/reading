@@ -22,13 +22,13 @@ class BookThumnail extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.all(5.0),
-        height: 280.0,
+        height: 320.0,
         width: 120.0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-              height: 200.0,
+              height: 180.0,
               width: 120.0,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -41,7 +41,7 @@ class BookThumnail extends StatelessWidget {
                 ],
               ),
               child: Container(
-                height: 200.0,
+                height: 180.0,
                 width: 120.0,
                 decoration: BoxDecoration(
                   color: const Color(0xff7c94b6),
@@ -89,7 +89,7 @@ class BookThumnail extends StatelessWidget {
               child: Text(
                 data['name'],
                 textAlign: TextAlign.left,
-                maxLines: 2,
+                maxLines: 3,
                 style: TextStyle(
                   color: Colors.black54,
                   fontWeight: FontWeight.w600,

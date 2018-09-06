@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/services/api.dart';
+import 'dart:async';
 
 class Read extends StatefulWidget {
   final data;
 
   Read(this.data);
-  // Read({Key key, this.data}) : super(key: key);
 
   @override
   _ReadState createState() => new _ReadState();
@@ -14,10 +15,16 @@ class _ReadState extends State<Read> {
   // final data;
   void initState() {
     super.initState();
+    content = widget.data['content'];
+    title = widget.data['title'];
+    // _getChapter();
   }
 
+  ApiService apiService = ApiService();
   var lightDart = 10.0;
   var themeDart = false;
+  var content = '';
+  var title = '';
   void _onLightDartChange(value) {
     setState(() {
       lightDart = value;
@@ -25,14 +32,23 @@ class _ReadState extends State<Read> {
   }
 
   void _onThemeDartChange(value) {
-    print(value);
     setState(() {
       themeDart = value;
     });
   }
 
+  // Future<Null> _getChapter() async {
+  //   await apiService.getChapper(widget.bookIndex, widget.index).then((value) {
+  //     setState(() {
+  //       content = value;
+  //     });
+  //   });
+  //   return null;
+  // }
+
   @override
   Widget build(BuildContext context) {
+    print(content);
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -49,7 +65,7 @@ class _ReadState extends State<Read> {
           color: Color(0xFF00995c),
         ),
         title: Text(
-          widget.data['Name'],
+          title,
           style: TextStyle(
             fontWeight: FontWeight.w700,
             color: Color(0xFF00995c),
@@ -83,7 +99,7 @@ class _ReadState extends State<Read> {
             color: themeDart ? Color(0xff333333) : Color(0xffffffff),
             padding: EdgeInsets.all(15.0),
             child: Text(
-              widget.data['Content'],
+              content,
               textDirection: TextDirection.ltr,
               textAlign: TextAlign.start,
               style: TextStyle(
@@ -93,6 +109,7 @@ class _ReadState extends State<Read> {
             ),
           ),
         ],
+        // onRefresh: _getChapter,
       ),
     );
   }

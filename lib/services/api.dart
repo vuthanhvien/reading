@@ -44,6 +44,13 @@ class ApiService {
   }
 
   Future getComments(book) async {
+    //get book in database local
+
+    //get book in server
+
+    //update local
+
+    //send date to me
     print('GET NEW COMMENT');
     final response =
         await http.get('https://read-book1.firebaseio.com/comments/$book.json');
@@ -53,9 +60,28 @@ class ApiService {
     }
   }
 
+  Future getChapters(book) async {
+    print('GET NEW CHAPter LIst');
+    final response =
+        await http.get('https://read-book1.firebaseio.com/chapter/$book.json');
+
+    if (response.statusCode == 200) {
+      return (json.decode(response.body));
+    }
+  }
+
   Future getBookSearch(key) async {
     final response = await http.get(
         'https://read-book1.firebaseio.com/books.json?startAt="$key"&orderBy="name"');
+
+    if (response.statusCode == 200) {
+      return (json.decode(response.body));
+    }
+  }
+
+  Future getChapper(book, chap) async {
+    final response = await http
+        .get('https://read-book1.firebaseio.com/chapter/$book/$chap.json');
 
     if (response.statusCode == 200) {
       return (json.decode(response.body));

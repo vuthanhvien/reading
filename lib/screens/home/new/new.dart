@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 import 'package:newapp/screens/search/index.dart';
 import 'package:newapp/widgets/book.dart';
 import 'package:newapp/widgets/category.dart';
@@ -72,6 +73,11 @@ class _NewPageState extends State<NewPage> {
     });
   }
 
+  Future<Null> _handleRefresh() async {
+    await loadData();
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +130,6 @@ class _NewPageState extends State<NewPage> {
                   setState(() {});
                 },
                 onSubmitted: (value) {
-                  // getBooks();
                   _searchAction(value);
                 },
               ),
@@ -146,24 +151,27 @@ class _NewPageState extends State<NewPage> {
           ),
         ],
       ),
-      body: ListView(
-        children: <Widget>[
-          // Sliders(sliders),
-          HeaderTilte('Sách dành cho bạn mỗi ngày'),
-          yourBooks != null ? BookListGrid(yourBooks) : Container(),
-          HeaderTilte('Sách nổi tiếng'),
-          popularBooks != null ? BookListGrid(popularBooks) : Container(),
-          HeaderTilte('Tác giả'),
-          AuthorList(authors),
-          HeaderTilte('Sách mới nhất'),
-          newBooks != null ? BookListGrid(newBooks) : Container(),
-          HeaderTilte('Tủ sách kinh điển'),
-          bestBooks != null ? BookListGrid(bestBooks) : Container(),
-          HeaderTilte('Thể loại'),
-          categories != null ? CategoryList(categories) : Container(),
-          // HeaderTilte('Bình luận mới'),
-          Container(height: 50.0)
-        ],
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: ListView(
+          children: <Widget>[
+            // Sliders(sliders),
+            HeaderTilte('Sách dành cho bạn mỗi ngày'),
+            yourBooks != null ? BookListGrid(yourBooks) : Container(),
+            HeaderTilte('Sách nổi tiếng'),
+            popularBooks != null ? BookListGrid(popularBooks) : Container(),
+            HeaderTilte('Tác giả'),
+            AuthorList(authors),
+            HeaderTilte('Sách mới nhất'),
+            newBooks != null ? BookListGrid(newBooks) : Container(),
+            HeaderTilte('Tủ sách kinh điển'),
+            bestBooks != null ? BookListGrid(bestBooks) : Container(),
+            HeaderTilte('Thể loại'),
+            categories != null ? CategoryList(categories) : Container(),
+            // HeaderTilte('Bình luận mới'),
+            Container(height: 30.0)
+          ],
+        ),
       ),
     );
   }
@@ -212,11 +220,13 @@ class BookListHoz extends StatelessWidget {
   @override
   Widget build(context) {
     List<Widget> list = new List();
-    data.forEach((key, value) {
-      list.add(BookThumnail(value, key));
-    });
+    if (data.length > 0) {
+      data.forEach((key, value) {
+        list.add(BookThumnail(value, key));
+      });
+    }
     return Container(
-      height: 270.0,
+      height: 320.0,
       child: ListView(
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
@@ -234,24 +244,26 @@ class AuthorList extends StatelessWidget {
   @override
   Widget build(context) {
     List<Widget> list = new List();
-    data.forEach((key, value) {
-      list.add(
-        Container(
-          margin: EdgeInsets.all(5.0),
-          padding: EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            color: Color.fromARGB(100, 10, 0, 162),
-          ),
-          child: Text(
-            value['name'],
-            style: TextStyle(
-              color: Colors.white,
+    if (data.length > 0) {
+      data.forEach((key, value) {
+        list.add(
+          Container(
+            margin: EdgeInsets.all(5.0),
+            padding: EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              color: Color.fromARGB(100, 10, 0, 162),
+            ),
+            child: Text(
+              value['name'],
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      });
+    }
     return Container(
       height: 50.0,
       child: ListView(
@@ -300,13 +312,17 @@ class CategoryList extends StatelessWidget {
   @override
   Widget build(context) {
     List<Widget> list = new List();
-    data.forEach((index, value) {
-      list.add(CategoryItem(value, index));
-    });
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: list,
+    if (data.length > 0) {
+      data.forEach((index, value) {
+        list.add(CategoryItem(value, index));
+      });
+    }
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: list,
+      ),
     );
   }
 }
