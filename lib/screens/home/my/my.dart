@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:newapp/widgets/book.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -8,6 +12,41 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   var isSearch = false;
+  Set<String> allBook;
+
+  @override
+  void initState() {
+    super.initState();
+    _getBook();
+  }
+
+  List<Widget> books = List();
+  _getBook() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    allBook = prefs.getKeys();
+    List<Widget> booksTemp = List();
+    allBook.forEach((item) async {
+      if (item.substring(0, 5) == 'BOOK_') {
+        String data = prefs.getString(item);
+        Map<dynamic, dynamic> newData = jsonDecode(data);
+        print(newData);
+        if (newData != null && newData['detail'] != null) {
+          booksTemp.add(BookThumnailHoz(newData['detail'], item.substring(5)));
+        }
+      }
+    });
+    if (booksTemp != null) {
+      setState(() {
+        books = booksTemp;
+      });
+    }
+  }
+
+  Future<Null> _handleRefresh() async {
+    await _getBook();
+    return null;
+  }
+
   // void _searchAction() {
   //   setState(() {
   //     isSearch = !isSearch;
@@ -80,8 +119,13 @@ class _MyPageState extends State<MyPage> {
           ),
         ],
       ),
-      body: Container(
-        child: Text('Mail page'),
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: books != null
+            ? ListView(
+                children: books,
+              )
+            : Container(),
       ),
     );
   }

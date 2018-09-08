@@ -87,4 +87,14 @@ class ApiService {
       return (json.decode(response.body));
     }
   }
+
+  Future getBookDetail(index) async {
+    print('GET Book ' + index);
+    final response =
+        await http.get('https://read-book1.firebaseio.com/books/$index.json');
+
+    if (response.statusCode == 200) {
+      return (json.decode(response.body));
+    }
+  }
 }

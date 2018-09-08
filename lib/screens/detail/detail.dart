@@ -4,6 +4,7 @@ import 'package:newapp/widgets/menutab.dart';
 import 'read/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:newapp/services/api.dart';
 
 class Detail extends StatefulWidget {
@@ -20,31 +21,47 @@ class _DetailState extends State<Detail> {
   var data;
   var image = '';
   var index = '';
-  var description = '';
-  var name = '';
-  var author = '';
+  var description = '.......................................';
+  var name = '.......................................';
+  var author = '.......................................';
   int chapterListLength = 0;
-  Map chapterList;
   int commentListLengh = 0;
-  var commentList;
+
+  Map chapterList;
+  Map commentList;
+
+  var isSave = false;
 
   ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    image = widget.data['image'];
     index = widget.index;
+    image = widget.data['image'];
     name = widget.data['name'];
     author = widget.data['author'];
     description = widget.data['description'];
-    // chapterList = widget.data['chapter'];
-    // chapterListLength = chapterList != null ? chapterList.length : 0;
+    // getDetail();
     getComment();
     getChapters();
+    checkSave();
   }
 
   var tab = 'Mô tả';
+
+  getDetail() async {
+    apiService.getBookDetail(index).then((value) {
+      setState(() {
+        if (value != null) {
+          image = value['image'];
+          name = value['name'];
+          author = value['author'];
+          description = value['description'];
+        }
+      });
+    });
+  }
 
   getComment() async {
     apiService.getComments(index).then((value) {
@@ -58,29 +75,57 @@ class _DetailState extends State<Detail> {
   }
 
   getChapters() async {
+    print(index);
     apiService.getChapters(index).then((value) {
       setState(() {
         if (value != null) {
           chapterList = value;
           chapterListLength = chapterList.length;
+          print(chapterList);
         }
       });
     });
   }
 
   _loveThis() {
-    getComment();
+    // getComment();
   }
 
   _saveBook() async {
-    print('Start save');
-    var json = new JsonCodec();
-    var s = json.encode({data: 'data'});
-    print(s);
+    Map<dynamic, dynamic> dataSave = new Map();
+    Map<dynamic, dynamic> bookDetail = new Map();
+
+    bookDetail['image'] = image;
+    bookDetail['name'] = name;
+    bookDetail['author'] = author;
+    bookDetail['description'] = description;
+
+    dataSave['detail'] = bookDetail;
+    dataSave['chapterList'] = chapterList;
+    var string = json.encode(dataSave);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('book', widget.data['Name']);
-    await prefs.setString('book', widget.data['Name']);
-    print('done');
+    prefs.setString('BOOK_' + index, string);
+    checkSave();
+  }
+
+  checkSave() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var string = prefs.getKeys();
+    print(string);
+    string.forEach((item) {
+      if (item == 'BOOK_' + index) {
+        setState(() {
+          isSave = true;
+        });
+      }
+    });
+  }
+
+  Future<Null> _handleRefresh() async {
+    await getDetail();
+    await getComment();
+    await getChapters();
+    return null;
   }
 
   @override
@@ -123,33 +168,69 @@ class _DetailState extends State<Detail> {
           ),
         ],
       ),
-      body: ListView(
-        // crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            color: Color(0xffe6fff5),
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  child: Container(
-                    height: 200.0,
-                    width: 120.0,
-                    decoration: BoxDecoration(
-                      color: const Color(0xff7c94b6),
-                      image: DecorationImage(
-                        image: CachedNetworkImageProvider(image),
-                        fit: BoxFit.cover,
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: ListView(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              color: Color(0xffe6fff5),
+              padding: EdgeInsets.all(10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Container(
+                      height: 200.0,
+                      width: 120.0,
+                      decoration: BoxDecoration(
+                        color: const Color(0xff7c94b6),
+                        image: DecorationImage(
+                          image: CachedNetworkImageProvider(image),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius:
+                            BorderRadius.all(new Radius.circular(10.0)),
                       ),
-                      borderRadius: BorderRadius.all(new Radius.circular(10.0)),
+                      child: isSave
+                          ? IconButton(
+                              color: Color(0xffffffff),
+                              onPressed: () {},
+                              icon: Icon(
+                                IconData(0xf3ff,
+                                    fontFamily: 'CupertinoIcons',
+                                    fontPackage: 'cupertino_icons'),
+                              ),
+                            )
+                          : FlatButton(
+                              padding: EdgeInsets.all(5.0),
+                              color: Color(0x55000000),
+                              onPressed: () {
+                                _saveBook();
+                              },
+                              child: Row(children: <Widget>[
+                                Icon(
+                                  IconData(
+                                    0xf408,
+                                    fontFamily: 'CupertinoIcons',
+                                    fontPackage: 'cupertino_icons',
+                                  ),
+                                  color: Color(0xffffffff),
+                                ),
+                                Text(
+                                  'Lưu về máy',
+                                  style: TextStyle(
+                                    color: Color(0xffffffff),
+                                  ),
+                                )
+                              ]),
+                            ),
                     ),
                   ),
-                ),
-                Container(
-                    padding: EdgeInsets.only(left: 15.0, top: 15.0),
+                  Container(
+                    padding: EdgeInsets.only(left: 15.0, top: 5.0),
                     width: screenWidth - 140.0,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,65 +261,56 @@ class _DetailState extends State<Detail> {
                         Row(
                           children: <Widget>[
                             FlatButton(
-                              color: Color(0xff0066ff),
+                              color: Color(0xff009933),
                               onPressed: () {},
                               child: Text(
                                 'Đọc chương đầu',
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            IconButton(
-                              color: Color(0xff009933),
-                              onPressed: () {
-                                _saveBook();
-                              },
-                              icon: Icon(
-                                IconData(0xf408,
-                                    fontFamily: 'CupertinoIcons',
-                                    fontPackage: 'cupertino_icons'),
-                              ),
-                            ),
                           ],
                         ),
                       ],
-                    ))
-              ],
-            ),
-          ),
-          MenuTab(
-            menu: [
-              'Mô tả',
-              'Mục lục ($chapterListLength)',
-              'Đánh giá ($commentListLengh)',
-            ],
-            onChanged: (tabChanged) {
-              setState(() {
-                tab = tabChanged;
-              });
-            },
-          ),
-          tab == 'Mô tả'
-              ? Container(
-                  padding: EdgeInsets.all(15.0),
-                  child: Text(
-                    description,
-                    // textAlign: TextAlign.start,
+                    ),
                   ),
-                )
-              : Container(),
-          tab == 'Mục lục ($chapterListLength)'
-              ? Container(
-                  child: ChapList(chapterList, widget.index),
-                )
-              : Container(),
-          tab == 'Đánh giá ($commentListLengh)'
-              ? Container(
-                  child: commentList != null
-                      ? CommentList(dataList: commentList)
-                      : Container(),
-                )
-              : Container(),
-        ],
+                ],
+              ),
+            ),
+            MenuTab(
+              menu: [
+                'Mô tả',
+                'Mục lục ($chapterListLength)',
+                'Đánh giá ($commentListLengh)',
+              ],
+              onChanged: (tabChanged) {
+                setState(() {
+                  tab = tabChanged;
+                });
+              },
+            ),
+            tab == 'Mô tả'
+                ? Container(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text(
+                      description,
+                      // textAlign: TextAlign.start,
+                    ),
+                  )
+                : Container(),
+            tab == 'Mục lục ($chapterListLength)'
+                ? Container(
+                    child: ChapList(chapterList, widget.index),
+                  )
+                : Container(),
+            tab == 'Đánh giá ($commentListLengh)'
+                ? Container(
+                    child: commentList != null
+                        ? CommentList(dataList: commentList)
+                        : Container(),
+                  )
+                : Container(),
+          ],
+        ),
       ),
     );
   }

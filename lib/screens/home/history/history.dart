@@ -117,8 +117,8 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ],
       ),
-      body: Container(
-        child: Text('Mail page'),
+      body: Center(
+        child: Text('COMMING SOON'),
       ),
     );
   }

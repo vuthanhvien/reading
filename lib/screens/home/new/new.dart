@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:newapp/screens/search/index.dart';
 import 'package:newapp/widgets/book.dart';
@@ -14,6 +13,7 @@ class NewPage extends StatefulWidget {
 
 class _NewPageState extends State<NewPage> {
   ApiService apiService = new ApiService();
+
   @override
   void initState() {
     super.initState();
@@ -244,7 +244,7 @@ class AuthorList extends StatelessWidget {
   @override
   Widget build(context) {
     List<Widget> list = new List();
-    if (data.length > 0) {
+    if (data != null && data.length > 0) {
       data.forEach((key, value) {
         list.add(
           Container(

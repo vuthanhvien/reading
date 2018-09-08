@@ -154,7 +154,7 @@ class BookThumnailHoz extends StatelessWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.all(15.0),
+              padding: EdgeInsets.only(left: 15.0),
               width: screenWidth - 140.0,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +171,7 @@ class BookThumnailHoz extends StatelessWidget {
                       ),
                     ),
                   ),
-                  data['Author'] != null
+                  data['author'] != null
                       ? Container(
                           child: Text(
                             data['author'],
@@ -215,6 +215,11 @@ class BookThumnailHoz extends StatelessWidget {
                       ],
                     ),
                   ),
+                  Text(
+                    data['description'],
+                    style: TextStyle(),
+                    maxLines: 5,
+                  )
                 ],
               ),
             )
