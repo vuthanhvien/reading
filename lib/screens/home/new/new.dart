@@ -5,6 +5,7 @@ import 'package:newapp/widgets/book.dart';
 import 'package:newapp/widgets/category.dart';
 
 import 'package:newapp/services/api.dart';
+import 'package:newapp/screens/author/author.dart';
 
 class NewPage extends StatefulWidget {
   @override
@@ -88,7 +89,6 @@ class _NewPageState extends State<NewPage> {
         title: Text(
           'Mỗi ngày 1 cuốn sách',
           style: TextStyle(
-            fontFamily: 'RobotoSlab',
             fontWeight: FontWeight.w700,
             color: Color(0xFF00995c),
           ),
@@ -139,16 +139,16 @@ class _NewPageState extends State<NewPage> {
         backgroundColor: Color(0xffe6fff5),
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          IconButton(
-            color: Color(0xFF00995c),
-            icon: Icon(
-              IconData(0xf39d,
-                  fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons'),
-            ),
-            onPressed: () {
-              loadData();
-            },
-          ),
+          // IconButton(
+          //   color: Color(0xFF00995c),
+          //   icon: Icon(
+          //     IconData(0xf39d,
+          //         fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons'),
+          //   ),
+          //   onPressed: () {
+          //     loadData();
+          //   },
+          // ),
         ],
       ),
       body: RefreshIndicator(
@@ -239,6 +239,13 @@ class BookListHoz extends StatelessWidget {
 class AuthorList extends StatelessWidget {
   final data;
 
+  void _openAuthor(index, data, context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AuthorDetail(data, index)),
+    );
+  }
+
   AuthorList(this.data);
 
   @override
@@ -247,19 +254,22 @@ class AuthorList extends StatelessWidget {
     if (data != null && data.length > 0) {
       data.forEach((key, value) {
         list.add(
-          Container(
-            margin: EdgeInsets.all(5.0),
-            padding: EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              color: Color.fromARGB(100, 10, 0, 162),
-            ),
+          FlatButton(
+            color: Color.fromARGB(100, 10, 0, 162),
             child: Text(
               value['name'],
               style: TextStyle(
                 color: Colors.white,
               ),
             ),
+            onPressed: () {
+              _openAuthor(key, value, context);
+            },
+          ),
+        );
+        list.add(
+          Container(
+            width: 10.0,
           ),
         );
       });

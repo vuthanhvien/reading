@@ -26,7 +26,7 @@ class _DetailState extends State<Detail> {
   var author = '.......................................';
   int chapterListLength = 0;
   int commentListLengh = 0;
-
+  bool loading = false;
   Map chapterList;
   Map commentList;
 
@@ -75,20 +75,15 @@ class _DetailState extends State<Detail> {
   }
 
   getChapters() async {
-    print(index);
     apiService.getChapters(index).then((value) {
       setState(() {
+        loading = true;
         if (value != null) {
           chapterList = value;
           chapterListLength = chapterList.length;
-          print(chapterList);
         }
       });
     });
-  }
-
-  _loveThis() {
-    // getComment();
   }
 
   _saveBook() async {
@@ -102,18 +97,27 @@ class _DetailState extends State<Detail> {
 
     dataSave['detail'] = bookDetail;
     dataSave['chapterList'] = chapterList;
+    //save all chapter by get all chapper
+    await apiService.getContentChapters(index).then((value) {
+      loading = true;
+      if (value != null) {
+        dataSave['contentChapterList'] = value;
+      }
+    });
+
     var string = json.encode(dataSave);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('BOOK_' + index, string);
-    checkSave();
+    // checkSave();
   }
 
   checkSave() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var string = prefs.getKeys();
-    print(string);
     string.forEach((item) {
       if (item == 'BOOK_' + index) {
+        String data = prefs.getString('BOOK_' + index);
+        print(data);
         setState(() {
           isSave = true;
         });
@@ -152,21 +156,6 @@ class _DetailState extends State<Detail> {
           iconSize: 42.0,
           color: Color(0xFF00995c),
         ),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              _loveThis();
-            },
-            icon: Icon(
-              IconData(
-                0xf442,
-                fontFamily: 'CupertinoIcons',
-                fontPackage: 'cupertino_icons',
-              ),
-            ),
-            color: Color(0xFF00995c),
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
@@ -194,39 +183,6 @@ class _DetailState extends State<Detail> {
                         borderRadius:
                             BorderRadius.all(new Radius.circular(10.0)),
                       ),
-                      child: isSave
-                          ? IconButton(
-                              color: Color(0xffffffff),
-                              onPressed: () {},
-                              icon: Icon(
-                                IconData(0xf3ff,
-                                    fontFamily: 'CupertinoIcons',
-                                    fontPackage: 'cupertino_icons'),
-                              ),
-                            )
-                          : FlatButton(
-                              padding: EdgeInsets.all(5.0),
-                              color: Color(0x55000000),
-                              onPressed: () {
-                                _saveBook();
-                              },
-                              child: Row(children: <Widget>[
-                                Icon(
-                                  IconData(
-                                    0xf408,
-                                    fontFamily: 'CupertinoIcons',
-                                    fontPackage: 'cupertino_icons',
-                                  ),
-                                  color: Color(0xffffffff),
-                                ),
-                                Text(
-                                  'Lưu về máy',
-                                  style: TextStyle(
-                                    color: Color(0xffffffff),
-                                  ),
-                                )
-                              ]),
-                            ),
                     ),
                   ),
                   Container(
@@ -260,14 +216,43 @@ class _DetailState extends State<Detail> {
                         ),
                         Row(
                           children: <Widget>[
-                            FlatButton(
-                              color: Color(0xff009933),
-                              onPressed: () {},
-                              child: Text(
-                                'Đọc chương đầu',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
+                            loading
+                                ? Container(
+                                    child: isSave
+                                        ? FlatButton(
+                                            color: Color(0xff009933),
+                                            onPressed: () {},
+                                            child: Row(
+                                              children: <Widget>[
+                                                Icon(
+                                                  IconData(0xf3ff,
+                                                      fontFamily:
+                                                          'CupertinoIcons',
+                                                      fontPackage:
+                                                          'cupertino_icons'),
+                                                  color: Colors.white,
+                                                ),
+                                                Container(width: 5.0),
+                                                Text(
+                                                  'Đã tải',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ))
+                                        : FlatButton(
+                                            color: Color(0xff009933),
+                                            onPressed: () {
+                                              _saveBook();
+                                            },
+                                            child: Text(
+                                              'Lưu về máy',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                  )
+                                : Container(),
                           ],
                         ),
                       ],
@@ -280,7 +265,7 @@ class _DetailState extends State<Detail> {
               menu: [
                 'Mô tả',
                 'Mục lục ($chapterListLength)',
-                'Đánh giá ($commentListLengh)',
+                // 'Đánh giá ($commentListLengh)',
               ],
               onChanged: (tabChanged) {
                 setState(() {
@@ -350,12 +335,12 @@ class _ChapListState extends State<ChapList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Read(item),
+                    builder: (context) => Read(key),
                   ),
                 );
               },
               child: Text(
-                item['title'],
+                key,
                 textAlign: TextAlign.start,
               ),
             ),

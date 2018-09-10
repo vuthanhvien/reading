@@ -107,14 +107,14 @@ class _HistoryPageState extends State<HistoryPage> {
         backgroundColor: Color(0xffe6fff5),
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          IconButton(
-            color: Color(0xFF00995c),
-            icon: Icon(
-              IconData(0xf39d,
-                  fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons'),
-            ),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   color: Color(0xFF00995c),
+          //   icon: Icon(
+          //     IconData(0xf39d,
+          //         fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons'),
+          //   ),
+          //   onPressed: () {},
+          // ),
         ],
       ),
       body: Center(
